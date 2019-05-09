@@ -1,0 +1,932 @@
+<!-- chat/templates/chat/room.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Clueless</title>
+    <style>
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  /* background-color: #2196F3; */
+  padding: 10px;
+}
+.grid-item {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.hallway-item {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 10px;
+  text-align: center;
+  height: 20px;
+}
+
+.room-grid {
+  display: grid;
+  /* grid-template-columns: auto auto; */
+  grid-template-columns: auto minmax(350px, 350px);
+  /* background-color: #2196F3; */
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  padding: 20px;
+  /* background-color: #2196F3; */
+}
+.character-grid-item {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  border: 1px solid rgba(0, 0, 0, 1);
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  padding: 20px;
+  /* background-color: #2196F3; */
+}
+
+.card-grid-item {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  border: 1px solid rgba(0, 0, 0, 1);
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.secret-card-item{
+   display: none;
+}
+
+</style>
+</head>
+<body>
+  <center>Clueless from Ctrl+Alt+Defeat</center>
+  <div class="room-grid">
+    <div>
+      <div class="character-grid">
+        <div class='character-grid-item'>
+          Colonel Mustard<br/>
+          <input id="colonel-mustard" type="button" value="plays by"
+          onClick="chooseCharacter('colonel-mustard')"/>
+          <div class='character' id="colonel-mustard-who"></div>
+        </div>
+        <div class='character-grid-item'>
+          Professor Pulm<br/>
+          <input id="professor-pulm"
+            type="button"
+            value="plays by"
+            onClick="chooseCharacter('professor-pulm')"/>
+          <div class='character' id="professor-pulm-who"></div>
+        </div>
+        <div class='character-grid-item'>
+          Mr Green<br/>
+          <input id="mr-green"
+            type="button"
+            value="plays by"
+            onClick="chooseCharacter('mr-green')"/>
+          <div class='character' id="mr-green-who"></div>
+        </div>
+        <div class='character-grid-item'>
+          Mrs Peacock<br/>
+          <input id="mrs-peacock" type="button" value="plays by"
+          onClick="chooseCharacter('mrs-peacock')"/>
+          <div class='character' id="mrs-peacock-who"></div>
+        </div>
+        <div class='character-grid-item'>
+          Miss Scarlet<br/>
+          <input id="miss-scarlet" type="button" value="plays by"
+          onClick="chooseCharacter('miss-scarlet')"/>
+          <div class='character' id="miss-scarlet-who"></div>
+        </div>
+        <div class='character-grid-item'>
+          Mrs White<br/>
+          <input id="mrs-white" type="button" value="plays by"
+          onClick="chooseCharacter('mrs-white')"/>
+          <div class='character' id="mrs-white-who"></div>
+        </div>
+        <div class='character-grid-item'>
+          <a id="mrs-white-who"></a> <br/>
+          <input id="mrs-white" type="button" value="start"
+          onClick="startGame()"/>
+        </div>
+      </div>
+      <div class='card-grid'>
+        <div class='card-grid-item'>
+          <a id="hands">Cards in your hand:<br/></a>
+        </div>
+          <div class='card-grid-item'>
+            <a id="hand0"></a>
+          </div>
+          <div class='card-grid-item'>
+            <a id="hand1"></a>
+          </div>
+          <div class='card-grid-item'>
+            <a id="hand2"></a>
+          </div>
+          <div class='card-grid-item'>
+            <a id="hand3"></a>
+          </div>
+          <div class='card-grid-item'>
+            <a id="hand4"></a>
+          </div>
+          <div class='card-grid-item'>
+            <a id="hand5"></a>
+          </div>
+          <br/>
+      </div>
+      <div class="grid-container">
+    <div class="grid-item">
+      Study
+      <div class='room' id="study-who"></div>
+      <input id="study" type="button" value="move"
+      onClick="chooseLocation('study')"/>
+      <div>↘</div>
+    </div>
+    <div class='grid-item'>
+      =
+      <div class='room' id="hallway1-who"></div>
+      <input id="hallway1" type="button" value="move"
+      onClick="chooseLocation('hallway1')"/>
+    </div>
+    <div class="grid-item">
+      Hall
+      <div class='room' id="hall-who"></div>
+      <input id="hall" type="button" value="move"
+      onClick="chooseLocation('hall')"/>
+    </div>
+    <div class="grid-item">
+      =
+      <div class='room' id="hallway2-who"></div>
+      <input id="hallway2" type="button" value="move"
+      onClick="chooseLocation('hallway2')"/>
+    </div>
+    <div class="grid-item">
+      Lounge
+      <div class='room' id="lounge-who"></div>
+      <input id="lounge" type="button" value="move"
+      onClick="chooseLocation('lounge')"/>
+      <div>↙</div>
+    </div>
+    <div class="grid-item">
+      ||
+      <div class='room' id="hallway3-who"></div>
+      <input id="hallway3" type="button" value="move"
+      onClick="chooseLocation('hallway3')"/>
+    </div>
+    <div class="grid-item"></div>
+    <div class="grid-item">
+      ||
+      <div class='room' id="hallway4-who"></div>
+      <input id="hallway4" type="button" value="move"
+      onClick="chooseLocation('hallway4')"/>
+    </div>
+    <div class="grid-item"></div>
+    <div class="grid-item">
+      ||
+      <div class='room' id="hallway5-who"></div>
+      <input id="hallway5" type="button" value="move"
+      onClick="chooseLocation('hallway5')"/>
+    </div>
+    <div class="grid-item">
+      Library
+      <div class='room' id="library-who"></div>
+      <input id="library" type="button" value="move"
+      onClick="chooseLocation('library')"/>
+    </div>
+    <div class="grid-item">
+      =
+      <div class='room' id="hallway6-who"></div>
+      <input id="hallway6" type="button" value="move"
+      onClick="chooseLocation('hallway6')"/>
+    </div>
+    <div class="grid-item">
+      Billiard Room
+      <div class='room' id="billiard-room-who"></div>
+      <input id="billiard-room" type="button" value="move"
+      onClick="chooseLocation('billiard-room')"/>
+    </div>
+    <div class="grid-item">
+      =
+      <div class='room' id="hallway7-who"></div>
+      <input id="hallway7" type="button" value="move"
+      onClick="chooseLocation('hallway7')"/>
+    </div>
+    <div class="grid-item">
+      Dining Room
+      <div class='room' id="dining-room-who"></div>
+      <input id="dining-room" type="button" value="move"
+      onClick="chooseLocation('dining-room')"/>
+    </div>
+    <div class="grid-item">
+      ||
+      <div class='room' id="hallway8-who"></div>
+      <input id="hallway8" type="button" value="move"
+      onClick="chooseLocation('hallway8')"/>
+    </div>
+    <div class="grid-item"></div>
+    <div class="grid-item">
+      ||
+      <div class='room' id="hallway9-who"></div>
+      <input id="hallway9" type="button" value="move"
+      onClick="chooseLocation('hallway9')"/>
+    </div>
+    <div class="grid-item"></div>
+    <div class="grid-item">
+      ||
+      <div class='room' id="hallway10-who"></div>
+      <input id="hallway10" type="button" value="move"
+      onClick="chooseLocation('hallway10')"/>
+    </div>
+    <div class="grid-item">
+      Conservatory
+      <div class='room' id="conservatory-who"></div>
+      <input id="conservatory" type="button" value="move"
+      onClick="chooseLocation('conservatory')"/>
+      <div>↗</div>
+    </div>
+    <div class="grid-item">
+      =
+      <div class='room' id="hallway11-who"></div>
+      <input id="hallway11" type="button" value="move"
+      onClick="chooseLocation('hallway11')"/>
+    </div>
+    <div class="grid-item">
+      Ballroom
+      <div class='room' id="ballroom-who"></div>
+      <input id="ballroom" type="button" value="move"
+      onClick="chooseLocation('ballroom')"/>
+    </div>
+    <div class="grid-item">
+      =
+      <div class='room' id="hallway12-who"></div>
+      <input id="hallway12" type="button" value="move"
+      onClick="chooseLocation('hallway12')"/>
+    </div>
+    <div class="grid-item">
+      Kitchen
+      <div class='room' id="kitchen-who"></div>
+      <input id="kitchen" type="button" value="move"
+      onClick="chooseLocation('kitchen')"/>
+      <div>↖</div>
+    </div>
+    </div>
+    </div>
+    <div>
+      <div>
+        Chat and Notification<br/>
+        <textarea id="chat-log" cols="50" rows="10"></textarea>
+        <br/>
+        <input id="chat-to" type="text" size="10">
+        <input id="chat-message-input" type="text" size="34"/>
+        <input id="chat-message-submit" type="button" value="Send" onClick='sendMessageByButton()'/>
+      </div><br/>
+      <!-- <div>
+        Chat<br/>
+        <textarea id="chat-log" cols="50" rows="10"></textarea>
+        <br/>
+        <input id="chat-message-input" type="text" size="44"/>
+        <input id="chat-message-submit" type="button" value="Send"/>
+      </div> -->
+      <div class='feature-grid' >
+        <div>
+          <div>
+          Suggestion<br/><br/>
+          Choose the character:<br/>
+          <select id='suggestion-character'>
+            <option value="colonelmustard">Colonel Mustard</option>
+            <option value="professorpulm">Professor Pulm</option>
+            <option value="mrgreen">Mr Green</option>
+            <option value="mrspeacock">Mrs Peacock</option>
+            <option value="missscarlet">Miss Scarlet</option>
+            <option value="mrswhite">Mrs White</option>
+          </select><br/>
+          Choose the weapon:<br/>
+          <select id='suggestion-weapon'>
+            <option value="candlestick">Candlestick</option>
+            <option value="revolver">Revolver</option>
+            <option value="knife">Knife</option>
+            <option value="leadpipe">Lead Pipe</option>
+            <option value="rope">Rope</option>
+            <option value="wrench">Wrench</option>
+          </select><br/>
+          Choose the room:<br/>
+          <select id='suggestion-room'>
+            <option value="study">Study</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="ballroom">Ballroom</option>
+            <option value="conservatory">Conservatory</option>
+            <option value="billiard">Billiard Room</option>
+            <option value="library">Library</option>
+            <option value="lounge">Lounge</option>
+            <option value="dining">Dining Room</option>
+            <option value="hall">Hall</option>
+          </select><br/>
+          <input id="suggestion" type="button" value="Submit"
+          onclick="sendSuggestion('suggestion-room',
+            'suggestion-weapon', 'suggestion-character')"/>
+          <!-- <input id="Accusation" type="button" value="Submit-+≠÷/> -->
+        </div>
+      </br>
+            <div>
+            Accusation<br/><br/>
+            Choose the character:<br/>
+            <select id='accusation-character'>
+              <option value="colonelmustard">Colonel Mustard</option>
+              <option value="professorpulm">Professor Pulm</option>
+              <option value="mrgreen">Mr Green</option>
+              <option value="mrspeacock">Mrs Peacock</option>
+              <option value="missscarlet">Miss Scarlet</option>
+              <option value="mrswhite">Mrs White</option>
+            </select><br/>
+            Choose the weapon:<br/>
+            <select id='accusation-weapon'>
+              <option value="candlestick">Candlestick</option>
+              <option value="revolver">Revolver</option>
+              <option value="knife">Knife</option>
+              <option value="leadpipe">Lead Pipe</option>
+              <option value="rope">Rope</option>
+              <option value="wrench">Wrench</option>
+            </select><br/>
+            Choose the room:<br/>
+            <select id='accusation-room'>
+              <option value="study">Study</option>
+              <option value="kitchen">Kitchen</option>
+              <option value="ballroom">Ballroom</option>
+              <option value="conservatory">Conservatory</option>
+              <option value="billiard">Billiard Room</option>
+              <option value="library">Library</option>
+              <option value="lounge">Lounge</option>
+              <option value="dining">Dining Room</option>
+              <option value="hall">Hall</option>
+            </select><br/>
+            <input id="Accusation" type="button" value="Submit"
+            onclick="checkAccusation('accusation-character',
+              'accusation-weapon', 'accusation-room')"/>
+          </div>
+        </div>
+        <div>
+        <table>
+          <tr>
+            <td>Subjects</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Colonel Mustard</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Professor Pulm</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Mr Green</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Mrs Peacock</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Miss Scarlet</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Mrs White</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Weapons</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Candlestick</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Revolver</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Knife</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Lead Pipe</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Rope</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Wrench</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Rooms</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Study</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Hall</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Louge</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Library</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Billiard Room</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Dining Room</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Conserv atory</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Ballroom</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+          <tr>
+            <td>Kitchen</td>
+            <td><input id="chat-message-input" type="text" size="10"/><br/></td>
+          </tr>
+        </table>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div id='secret-card-item' class='secret-card-item'></div>
+</body>
+<script>
+    var parts = window.location.href.split('/');
+    var roomName = parts[4];
+    var username = parts[5];
+    var to = '';
+
+    var chatSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName +'/' + username + '/');
+
+    var gameSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/game/' + roomName +'/' + username + '/');
+    var subjects = ['colonelmustard','professorpulm','mrgreen','mrspeacock','missscarlet','mrswhite'];
+    var weapons = ['candlestick','revolver','knife','leadpipe','rope','wrench'];
+    var rooms	=['study', 'hall', 'lounge','library', 'billiardroom',
+    'diningroom', 'conservatory', 'ballroom', 'kitchen'];
+    // var orderList = ["missscarlet", "colonelmustard", "mrswhite", "mrgreen", "mrspeacock", "professorpulm"];
+
+    var secretCards = {
+      'character': subjects[Math.floor(Math.random()* 6)],
+      'weapon': weapons[Math.floor(Math.random()*6)],
+      'room': rooms[Math.floor(Math.random()*9)],
+    };
+
+    var paths = {
+      'study': ['hallway1', 'hallway3', 'kitchen'],
+      'hallway1': ['study', 'hall'],
+      'hall': ['hallway1', 'hallway2', 'hallway4'],
+      'hallway2':['hall', 'lounge'],
+      'lounge': ['hallway2', 'conservatory', 'hallway5'],
+      'hallway3': ['study', 'library'],
+      'hallway4': ['hall', 'billiardroom'],
+      'hallway5': ['lounge', 'diningroom'],
+      'library': ['hallway3', 'hallway6', 'hallway8'],
+      'hallway6': ['library', 'billiard'],
+      'billiard': ['hallway6', 'hallway4', 'hallway7', 'hallway9'],
+      'hallway7': ['billiardroom', 'diningroom'],
+      'diningroom': ['hallway7', 'hallway5', 'hallway10'],
+      'hallway8': ['library', 'conservatory'],
+      'hallway9': ['billiardroom', 'ballroom'],
+      'hallway10': ['diningroom', 'kitchen'],
+      'conservatory': ['hallway8', 'lounge', 'hallway11'],
+      'hallway11': ['conservatory', 'ballroom'],
+      'ballroom': ['hallway11', 'hallway9', 'hallway12'],
+      'hallway12': ['ballroom', 'kitchen'],
+      'kitchen': ['hallway12', 'study', 'hallway10'],
+    };
+
+    var startingPoint = {
+      'colonelmustard':'hallway5',
+      'missscarlet':'hallway2',
+      'professorplum':'hallway3',
+      'mrspeacock':'hallway8',
+      'mrgreen':'hallway11',
+      'mrswhite':'hallway12'
+    };
+
+    gameSocket.onmessage = function(e){
+      var data = JSON.parse(e.data);
+      if (data['command']==='new_location'){
+          assignLocation(data);
+      }
+      if (data['command']==='choose_character'){
+          assignCharacter(data);
+      }
+      if (data['command']==='secret'){
+        assignSecret(data);
+      }
+      if (data['command']==='hands'){
+        assignHands(data['hands'][username]);
+      }
+    }
+    gameSocket.onopen = function(e) {
+    }
+    gameSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    chatSocket.onopen = function(e) {
+      fetchMessages();
+    }
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        if (data['command']==='messages'){
+          for (let i=0; i<data['messages'].length; i++){
+            if (data['messages'][i]['author']==username ||
+                data['messages'][i]['to']==username ||
+                data['messages'][i]['to']=='' ||
+                data['messages'][i]['to']=='all'){
+            createMessage(data['messages'][i]);
+            }
+          }
+        } else if (data['command']==='new_message'){
+            if (data['message']['author']==username ||
+                data['message']['to']==username ||
+                data['message']['to']=='' ||
+                data['message']['to']=='all'){
+              createMessage(data['message']);
+            }
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+
+    // document.querySelector('#chat-message-submit').onclick = function(e) {
+    //     var messageInputDom = document.querySelector('#chat-message-input');
+    //     // var chatTo = document.querySelector('#chat-to');
+    //     var message = messageInputDom.value;
+    //     chatSocket.send(JSON.stringify({
+    //         'message': message,
+    //         'command': 'new_messages',
+    //         'from': username,
+    //         'to': to
+    //     }));
+    //
+    //     messageInputDom.value = '';
+    // };
+
+    function sendMessageByButton(){
+      var messageInputDom = document.querySelector('#chat-message-input');
+      var message = messageInputDom.value;
+      var toInputDom = document.querySelector('#chat-to');
+      var to = toInputDom.value;
+      chatSocket.send(JSON.stringify({
+          'message': message,
+          'command': 'new_messages',
+          'from': username,
+          'to': to
+      }));
+      messageInputDom.value = '';
+    }
+
+    function sendMessage(message, to){
+      chatSocket.send(JSON.stringify({
+          'message': message,
+          'command': 'new_messages',
+          'from': username,
+          'to':to
+      }));
+    }
+
+    function sendSuggestion(location, weapon, character){
+      var weapon = document.getElementById(weapon).value;
+      var room = document.getElementById(location).value;
+      var character = document.getElementById(character).value;
+      // if (character_name=='mrspeacock'){
+      //   character_name='mrs-peacock';
+      // }
+      // if (document.querySelector('#'+character_name+'-who').innerHTML !==''){
+      //   var character = document.querySelector('#'+character_name+'-who').innerHTML;
+      // } else{
+      //   var character = document.getElementById(character).value;
+      // }
+      chooseLocation(room, true, character);
+      sendMessage('suggestion - room: ' + room + ' weapon: '+weapon + ' character: ' + character, 'all');
+    }
+
+    function fetchMessages(){
+      chatSocket.send(JSON.stringify({'command':'fetch_messages'}));
+    }
+
+    function createMessage(data){
+      document.querySelector('#chat-log').value += (data.author + ': ' + data.content + '\n');
+    }
+
+    function assignLocation(data){
+      document.querySelector('#'+data.location+'-who').innerHTML = data.player;
+      // if (document.querySelector('#'+data.location+'-who').innerHTML===''){
+      //   document.querySelector('#'+data.location+'-who').innerHTML = data.player;
+      // } else{
+      //   document.querySelector('#'+data.location+'-who').innerHTML += ', '+data.player;
+      // }
+    }
+
+    function assignCharacter(data){
+      document.querySelector('#' + data.character + '-who').innerHTML = data.from;
+    }
+
+    function assignSecret(data){
+      console.log(JSON.stringify(data));
+      document.querySelector('#secret-card-item').innerHTML = JSON.stringify(data);
+    }
+
+    function assignHands(data){
+      for (var i=0; i<data.length; i++){
+        document.querySelector('#hand' + i.toString()).innerHTML = data[i];
+      }
+    }
+
+    function checkChosenCharacter(){
+      var character_list = document.getElementsByClassName('character');
+      for (var i=0; i<character_list.length; i++){
+        if (character_list[i].innerHTML===username) {
+          return true
+        }
+      }
+      return false;
+    }
+
+    function getAllPlayers(){
+      var player_list = [];
+      var character_list = document.getElementsByClassName('character');
+      for (var i=0; i<character_list.length; i++){
+        if (character_list[i].innerHTML!=='') {
+          player_list.push(character_list[i].innerHTML);
+        }
+      }
+      return player_list;
+    }
+
+    function checkNumOfPlayers(){
+      var numOfPlayers=0;
+      var character_list = document.getElementsByClassName('character');
+      for (var i=0; i<character_list.length; i++){
+        if (character_list[i].innerHTML!=='') {
+          numOfPlayers++;
+        }
+      }
+      return numOfPlayers;
+    }
+
+    function chooseCharacter(character){
+      if (document.querySelector('#'+character+'-who').innerHTML==='' &&
+          !checkChosenCharacter()
+    ){
+        gameSocket.send(JSON.stringify({
+            'command': 'choose_character',
+            'from': username,
+            'character': character
+        }));
+      } else if(checkChosenCharacter()){
+        alert('You have already chosen you character!');
+      } else {
+        alert('played by someone already!');
+      }
+    }
+
+    function sendLocationJson(username, location){
+      return gameSocket.send(JSON.stringify({
+          'command': 'move',
+          'player': username,
+          'location':location
+      }));
+    }
+
+    function getUserName(){
+      return username;
+    }
+
+    function checkIfPlayerCanGotoThatRoom(old_location, new_location){
+      return paths[old_location].includes(new_location);
+    }
+
+    function currentLocation(){
+      var grid_detail = document.getElementsByClassName('room');
+      for (var i=0; i<grid_detail.length; i++){
+        if (grid_detail[i].innerHTML.includes(username)) {
+          return grid_detail[i].id.replace('-who', '');
+        }
+      }
+    }
+
+    // function userLocation(suggestion_user){
+    //   var grid_detail = document.getElementsByClassName('room');
+    //   for (var i=0; i<grid_detail.length; i++){
+    //     if (grid_detail[i].innerHTML.includes(suggestion_user)) {
+    //       return grid_detail[i].id.replace('-who', '');
+    //     }
+    //   }
+    // }
+
+    function chooseLocation(location, teleport=false, user=getUserName(), suggestion=''){
+      if (teleport){
+        if (location.substring(0,7)==='hallway'){
+          if (document.querySelector('#'+location+'-who').innerHTML===''){
+            sendLocationJson(user, location);
+          } else {
+            alert('Someone is in the hallway already');
+          }
+        } else{
+          if (document.querySelector('#'+location+'-who').innerHTML===''){
+            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
+              sendLocationJson('', currentLocation());
+              sendLocationJson(user, location);
+            } else {
+              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string=character_string.replace(user, '');
+              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(user, location);
+            }
+          } else{
+            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
+              character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
+              sendLocationJson('', currentLocation());
+              sendLocationJson(character_string, location);
+            } else {
+              console.log('this scenario');
+              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string=character_string.replace(user, '');
+              new_character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
+              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(new_character_string, location);
+            }
+          }
+        }
+      } else if (checkIfPlayerCanGotoThatRoom(currentLocation(), location) && !teleport){
+        if (location.substring(0,7)==='hallway'){
+          if (document.querySelector('#'+location+'-who').innerHTML===''){
+            character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+            character_string=character_string.replace(user, '');
+            sendLocationJson(user, location);
+            sendLocationJson(character_string, currentLocation());
+          } else {
+            alert('Someone is in the hallway already');
+          }
+        } else{
+          if (document.querySelector('#'+location+'-who').innerHTML===''){
+            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
+              sendLocationJson('', currentLocation());
+              sendLocationJson(user, location);
+            } else {
+              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string=character_string.replace(user, '');
+              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(user, location);
+            }
+          } else{
+            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
+              character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
+              sendLocationJson('', currentLocation());
+              sendLocationJson(character_string, location);
+            } else {
+              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string=character_string.replace(user, '');
+              new_character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
+              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(new_character_string, location);
+            }
+          }
+        }
+      }
+    }
+
+    function sendSecretCardsJson(cards){
+      return gameSocket.send(JSON.stringify({
+          'command': 'secret',
+          'character': cards.character,
+          'room':cards.room,
+          'weapon':cards.weapon
+      }));
+    }
+
+    function checkAccusation(char,weap,loc) {
+      var character = document.getElementById(char).value;
+      var weapon = document.getElementById(weap).value;
+      var room = document.getElementById(loc).value;
+      var answer = JSON.parse(document.querySelector('#secret-card-item').innerHTML);
+      if (answer['character']===character &&answer['weapon']===weapon &&
+        answer['room']===room){
+          alert('you win!');
+        }else{
+          alert('you lose');
+        }
+    }
+
+    function shuffle(array) {
+      var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+      while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+    // And swap it with the current element.
+      temporaryValue = array[currentIndex];
+      array[currentIndex] = array[randomIndex];
+      array[randomIndex] = temporaryValue;
+      }
+      return array;
+    }
+
+    function shuffleCardsForHands(){
+      var all_cards = subjects.concat(weapons, rooms);
+      var secretCardsList = [secretCards['character'], secretCards['weapon'], secretCards['room']]
+      var difference = all_cards.filter(x => !secretCardsList.includes(x));
+      player_list = getAllPlayers();
+      cards_in_each_hands = {};
+      for (var i=0; i<player_list.length; i++){
+        cards_in_each_hands[player_list[i]]=[];
+      }
+      for (var j=0; j<difference.length; j++){
+        who = j%player_list.length;
+        cards_in_each_hands[player_list[who]].push(difference[j]);
+      }
+      return cards_in_each_hands;
+    }
+
+    function sendHandsJson(){
+      return gameSocket.send(JSON.stringify({
+          'command': 'hands',
+          'hands': shuffleCardsForHands()
+      }));
+    }
+
+    function removeCharacterInOrderList(target){
+      orderList.splice(orderList.indexOf(target),1);
+      return orderList;
+    }
+
+    function startGame(){
+      // var num_of_players = checkNumOfPlayers();
+      var num_of_players = 3;
+      var character_list = document.getElementsByClassName('character');
+      for (var i=0; i<character_list.length; i++){
+        if (character_list[i].innerHTML !==''){
+          var location = startingPoint[character_list[i].id.replace('-', '').replace('-who', '')];
+          chooseLocation(location, true, character_list[i].innerHTML);
+        }
+      }
+      sendSecretCardsJson(secretCards);
+      sendHandsJson();
+      // if (checkNumOfPlayers() > 2){
+      //   alert('Send to consumers to update the starting position');
+      // } else{
+      //   alert('You need more players!');
+      // }
+      // alert('there is a function to check num of players, write this function to send to consumers to update the starting position');
+
+    }
+</script>
+</html>
