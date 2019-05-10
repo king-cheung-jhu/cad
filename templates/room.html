@@ -1,4 +1,4 @@
-<!-- chat/templates/chat/room.html -->
+﻿<!-- chat/templates/chat/room.html -->
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -77,53 +77,57 @@
 </head>
 <body>
   <center>Clueless from Ctrl+Alt+Defeat</center>
+	<p id="test"></p>	
   <div class="room-grid">
     <div>
       <div class="character-grid">
         <div class='character-grid-item'>
           Colonel Mustard<br/>
-          <input id="colonel-mustard" type="button" value="plays by"
+          <input id="colonel-mustard" type="button" value="played by"
           onClick="chooseCharacter('colonel-mustard')"/>
           <div class='character' id="colonel-mustard-who"></div>
         </div>
         <div class='character-grid-item'>
-          Professor Pulm<br/>
-          <input id="professor-pulm"
+          Professor Plum<br/>
+          <input id="professor-plum"
             type="button"
-            value="plays by"
-            onClick="chooseCharacter('professor-pulm')"/>
-          <div class='character' id="professor-pulm-who"></div>
+            value="played by"
+            onClick="chooseCharacter('professor-plum')"/>
+          <div class='character' id="professor-plum-who"></div>
         </div>
         <div class='character-grid-item'>
           Mr Green<br/>
           <input id="mr-green"
             type="button"
-            value="plays by"
+            value="played by"
             onClick="chooseCharacter('mr-green')"/>
           <div class='character' id="mr-green-who"></div>
         </div>
         <div class='character-grid-item'>
           Mrs Peacock<br/>
-          <input id="mrs-peacock" type="button" value="plays by"
+          <input id="mrs-peacock" type="button" value="played by"
           onClick="chooseCharacter('mrs-peacock')"/>
           <div class='character' id="mrs-peacock-who"></div>
         </div>
         <div class='character-grid-item'>
           Miss Scarlet<br/>
-          <input id="miss-scarlet" type="button" value="plays by"
+          <input id="miss-scarlet" type="button" value="played by"
           onClick="chooseCharacter('miss-scarlet')"/>
           <div class='character' id="miss-scarlet-who"></div>
         </div>
         <div class='character-grid-item'>
           Mrs White<br/>
-          <input id="mrs-white" type="button" value="plays by"
+          <input id="mrs-white" type="button" value="played by"
           onClick="chooseCharacter('mrs-white')"/>
           <div class='character' id="mrs-white-who"></div>
         </div>
         <div class='character-grid-item'>
-          <a id="mrs-white-who"></a> <br/>
-          <input id="mrs-white" type="button" value="start"
-          onClick="startGame()"/>
+          <a id="mrs-white-who"></a>
+          <input id="start-game-button" type="button" value="Start Game"
+          onClick="startGame()"/><br/><br/>
+          <input id="end-game-button" type="button" value="End Turn"
+          onClick="endTurn()"/>
+
         </div>
       </div>
       <div class='card-grid'>
@@ -217,9 +221,9 @@
     </div>
     <div class="grid-item">
       Billiard Room
-      <div class='room' id="billiard-room-who"></div>
-      <input id="billiard-room" type="button" value="move"
-      onClick="chooseLocation('billiard-room')"/>
+      <div class='room' id="billiardroom-who"></div>
+      <input id="billiardroom" type="button" value="move"
+      onClick="chooseLocation('billiardroom')"/>
     </div>
     <div class="grid-item">
       =
@@ -229,9 +233,9 @@
     </div>
     <div class="grid-item">
       Dining Room
-      <div class='room' id="dining-room-who"></div>
-      <input id="dining-room" type="button" value="move"
-      onClick="chooseLocation('dining-room')"/>
+      <div class='room' id="diningroom-who"></div>
+      <input id="diningroom" type="button" value="move"
+      onClick="chooseLocation('diningroom')"/>
     </div>
     <div class="grid-item">
       ||
@@ -310,7 +314,7 @@
           Choose the character:<br/>
           <select id='suggestion-character'>
             <option value="colonelmustard">Colonel Mustard</option>
-            <option value="professorpulm">Professor Pulm</option>
+            <option value="professorplum">Professor Plum</option>
             <option value="mrgreen">Mr Green</option>
             <option value="mrspeacock">Mrs Peacock</option>
             <option value="missscarlet">Miss Scarlet</option>
@@ -348,7 +352,7 @@
             Choose the character:<br/>
             <select id='accusation-character'>
               <option value="colonelmustard">Colonel Mustard</option>
-              <option value="professorpulm">Professor Pulm</option>
+              <option value="professorplum">Professor Plum</option>
               <option value="mrgreen">Mr Green</option>
               <option value="mrspeacock">Mrs Peacock</option>
               <option value="missscarlet">Miss Scarlet</option>
@@ -391,7 +395,7 @@
             <td><input id="chat-message-input" type="text" size="10"/><br/></td>
           </tr>
           <tr>
-            <td>Professor Pulm</td>
+            <td>Professor Plum</td>
             <td><input id="chat-message-input" type="text" size="10"/><br/></td>
           </tr>
           <tr>
@@ -451,7 +455,7 @@
             <td><input id="chat-message-input" type="text" size="10"/><br/></td>
           </tr>
           <tr>
-            <td>Louge</td>
+            <td>Lounge</td>
             <td><input id="chat-message-input" type="text" size="10"/><br/></td>
           </tr>
           <tr>
@@ -498,11 +502,11 @@
     var gameSocket = new WebSocket(
         'ws://' + window.location.host +
         '/ws/game/' + roomName +'/' + username + '/');
-    var subjects = ['colonelmustard','professorpulm','mrgreen','mrspeacock','missscarlet','mrswhite'];
+    var subjects = ['colonelmustard','professorplum','mrgreen','mrspeacock','missscarlet','mrswhite'];
     var weapons = ['candlestick','revolver','knife','leadpipe','rope','wrench'];
     var rooms	=['study', 'hall', 'lounge','library', 'billiardroom',
     'diningroom', 'conservatory', 'ballroom', 'kitchen'];
-    // var orderList = ["missscarlet", "colonelmustard", "mrswhite", "mrgreen", "mrspeacock", "professorpulm"];
+    // var orderList = ["missscarlet", "colonelmustard", "mrswhite", "mrgreen", "mrspeacock", "professorplum"];
 
     var secretCards = {
       'character': subjects[Math.floor(Math.random()* 6)],
@@ -521,7 +525,7 @@
       'hallway5': ['lounge', 'diningroom'],
       'library': ['hallway3', 'hallway6', 'hallway8'],
       'hallway6': ['library', 'billiard'],
-      'billiard': ['hallway6', 'hallway4', 'hallway7', 'hallway9'],
+      'billiardroom': ['hallway6', 'hallway4', 'hallway7', 'hallway9'],
       'hallway7': ['billiardroom', 'diningroom'],
       'diningroom': ['hallway7', 'hallway5', 'hallway10'],
       'hallway8': ['library', 'conservatory'],
@@ -542,6 +546,19 @@
       'mrgreen':'hallway11',
       'mrswhite':'hallway12'
     };
+    
+    //turn "class"
+    function turnClass(turnNum, turnUser){
+        this.turnNum = turnNum;
+        this.turnUser = turnUser;
+        this.moved = false; //has player moved this turn
+
+    }
+    
+    //instantiate turn, probably unsafe
+    var currentTurn = new turnClass(0,''); //completely initialized in startGame
+    var playerList; //initialized in startGame, stores users still in the game, also probably unsafe
+    var gameStarted = false;
 
     gameSocket.onmessage = function(e){
       var data = JSON.parse(e.data);
@@ -556,6 +573,9 @@
       }
       if (data['command']==='hands'){
         assignHands(data['hands'][username]);
+      }
+      if (data['command']==='next_turn'){
+        shareTurn(data);
       }
     }
     gameSocket.onopen = function(e) {
@@ -634,6 +654,15 @@
           'message': message,
           'command': 'new_messages',
           'from': username,
+          'to':to
+      }));
+    }
+    
+    function sendMessageFromSystem(message,to){
+        chatSocket.send(JSON.stringify({
+          'message': message,
+          'command': 'new_messages',
+          'from': 'SYSTEM',
           'to':to
       }));
     }
@@ -733,13 +762,29 @@
         alert('played by someone already!');
       }
     }
-
+	
+	
     function sendLocationJson(username, location){
       return gameSocket.send(JSON.stringify({
           'command': 'move',
           'player': username,
-          'location':location
-      }));
+          'location':location         
+      }));     
+    }
+    
+    function sendTurnJson(){
+        return gameSocket.send(JSON.stringify({
+          'command': 'next_turn',
+          'turnUser': currentTurn.turnUser,
+          'turnNum': currentTurn.turnNum        
+      })); 
+    }
+    
+    function shareTurn(data){
+        //change local version
+        currentTurn.turnNum = data.turnNum;
+        currentTurn.turnUser = data.turnUser;
+        
     }
 
     function getUserName(){
@@ -769,10 +814,12 @@
     // }
 
     function chooseLocation(location, teleport=false, user=getUserName(), suggestion=''){
+      if(teleport || (isMyTurn() && !currentTurn.moved)){
+              
       if (teleport){
         if (location.substring(0,7)==='hallway'){
           if (document.querySelector('#'+location+'-who').innerHTML===''){
-            sendLocationJson(user, location);
+            sendLocationJson(user, location);		
           } else {
             alert('Someone is in the hallway already');
           }
@@ -800,7 +847,7 @@
               sendLocationJson(character_string, currentLocation());
               sendLocationJson(new_character_string, location);
             }
-          }
+          }         
         }
       } else if (checkIfPlayerCanGotoThatRoom(currentLocation(), location) && !teleport){
         if (location.substring(0,7)==='hallway'){
@@ -809,6 +856,7 @@
             character_string=character_string.replace(user, '');
             sendLocationJson(user, location);
             sendLocationJson(character_string, currentLocation());
+            currentTurn.moved = true;
           } else {
             alert('Someone is in the hallway already');
           }
@@ -835,8 +883,20 @@
               sendLocationJson(character_string, currentLocation());
               sendLocationJson(new_character_string, location);
             }
-          }
+          }         
+          currentTurn.moved = true; //player has made move, can no longer move
+          
+          
+          
         }
+      }
+      
+      }//end of first if
+      else if(!isMyTurn()){
+        alert('It is not your turn!');
+      }
+      else{
+        alert('You have already moved this turn!');  
       }
     }
 
@@ -907,19 +967,88 @@
       orderList.splice(orderList.indexOf(target),1);
       return orderList;
     }
+    
+    
+    //returns boolean that tells you if it's your turn or not.
+    function isMyTurn(){
+        return currentTurn.turnUser === username;
+    }
+    
+    //increments turn class. Should be used after a move.
+    function nextTurn(){
+        
+        
+        playerList = getAllPlayers();      
+       
+        //change turn user   
+        if(playerList.indexOf(currentTurn.turnUser) + 1 === playerList.length){
+            currentTurn.turnUser = playerList[0]; //wrap around to beginning of array
+        }
+        else{                    
+            currentTurn.turnUser = playerList[playerList.indexOf(currentTurn.turnUser)+1];
+        }
+        
+        currentTurn.moved = false;
+        currentTurn.turnNum++;
+        sendMessageFromSystem('Turn: ' + currentTurn.turnNum,'all');
+        sendTurnJson();
+        sendMessageFromSystem(playerList,'all');
+    }
+    
+    function endTurn(){
+        if(currentTurn.turnUser === username){
+            nextTurn();  
+        }
+        else{
+            alert('It is not your turn!');
+        }
+        //insert additional processing at end of turn, if needed
+    }
+    
+    //removes current user(player) after wrong accusation. Can only be called by the relevant user on their turn
+    function removeUserFromPlayerList(){
+        for(var i=0; i < playerList.length; i++){
+            if(playerList[i] === username){
+                playerList.splice(i,1);
+                i--;
+            }
+        }
+    }
 
     function startGame(){
-      // var num_of_players = checkNumOfPlayers();
-      var num_of_players = 3;
-      var character_list = document.getElementsByClassName('character');
-      for (var i=0; i<character_list.length; i++){
-        if (character_list[i].innerHTML !==''){
-          var location = startingPoint[character_list[i].id.replace('-', '').replace('-who', '')];
-          chooseLocation(location, true, character_list[i].innerHTML);
+        var num_of_players = checkNumOfPlayers();
+        //var num_of_players = 3;
+      
+        if(num_of_players >= 3 && !gameStarted){
+            var character_list = document.getElementsByClassName('character');
+            for (var i=0; i<character_list.length; i++){
+                if (character_list[i].innerHTML !==''){
+                    var location = startingPoint[character_list[i].id.replace('-', '').replace('-who', '')];
+                    chooseLocation(location, true, character_list[i].innerHTML);
+                }
+            }
+        sendSecretCardsJson(secretCards);
+        sendHandsJson();
+        playerList = getAllPlayers();
+        gameStarted = true;
+      
+        //Begin Turn 1
+        currentTurn.turnNum++;
+        currentTurn.turnUser = playerList[0];
+      
+        //message in chat to indicate started game
+        sendMessageFromSystem('---------- Starting Game... ----------','all');
+        sendMessageFromSystem('Turn: ' + currentTurn.turnNum,'all');
+        sendMessageFromSystem(playerList,'all');
         }
-      }
-      sendSecretCardsJson(secretCards);
-      sendHandsJson();
+        else if(gameStarted){
+            alert('Game already started! Finish current game to start a new one');
+        }
+        else{
+            alert('You need more players (3-6)!');
+        }
+        
+      //
       // if (checkNumOfPlayers() > 2){
       //   alert('Send to consumers to update the starting position');
       // } else{

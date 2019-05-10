@@ -77,6 +77,24 @@ class GameConsumer(WebsocketConsumer):
         # var subjects = ['colonelmustard','professorpulm','mrgreen','mrspeacock','missscarlet','mrswhite'];
         # var weapons = ['candlestick','revolver','knife','leadpipe','rope','abc'];
 
+    def player_starts_turn(self, data):
+
+        content = {
+            'command' : 'new_turn',
+            'turn_num': data['turnNum'],
+            'turn_user' : data['turnUser']
+        }
+        return self.advance_turn(content)
+
+    def advance_turn(self, content):
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'next_turn',
+                'turn_data': content
+            }
+        )    
+
     def assign_secret(self, content):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
@@ -150,6 +168,9 @@ class GameConsumer(WebsocketConsumer):
     def hands(self, content):
         return self.send(text_data=json.dumps(content['hands']))
 
+    def next_turn(self, content):
+        return self.send(text_data=json.dumps(content['turn_data']))
+
 
     game_commands = {
         'fetch_messages' : fetch_messages,
@@ -158,4 +179,5 @@ class GameConsumer(WebsocketConsumer):
         'choose_character': assign_to_new_character,
         'secret': assign_secret,
         'hands': assign_hands,
+        'next_turn': advance_turn,
     }

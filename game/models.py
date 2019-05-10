@@ -7,6 +7,9 @@ class Game(models.Model):
     player = models.ForeignKey(User, related_name='game', on_delete=models.CASCADE)
     location = ((1, 'study'), (2, 'hallway1'), (3, 'Hall'))
     timestamp = models.DateTimeField(auto_now_add=True)
+    turn_num = models.IntegerField()
+    turn_user = models.CharField(max_length=30)
+
     # colonel_mustard = models.ForeignKey(Player)
     # professor_pulm = models.ForeignKey(Player)
     # mr_green = models.ForeignKey(Player)
