@@ -5,13 +5,45 @@
     <meta charset="utf-8"/>
     <title>Chat Rooms</title>
 </head>
-<body>
-  <center>Clueless from Ctrl+Alt+Defeat</center>
-    Player Name:<br/>
+<style>
+  body {
+    color: white;
+    font-family: verdana;
+    background-color:#E8E8E8;
+    <!--background-image:url("question.jpg"); -->
+    background-repeat: no-repeat;
+    background-position: auto;
+    background-size: 150px 150px;
+    background-repeat: no-repeat;
+
+
+
+
+  }
+</style>
+<header>
+  <button onclick="window.location.href='register.html';">Register</button>
+  <center style="font-size: 70px; color: orange">Clueless</center>
+  <br>
+</header>
+<body style="color:orange">
+
+
+
+    <center>
+    <b>Player Name:</b><br/>
     <input id="player-name-input" type="text" size="100"/><br/>
-    What game would you like to enter?<br/>
+    <br>
+    <b>What game would you like to enter?<b><br/>
     <input id="room-name-input" type="text" size="100"/><br/>
-    <input id="login-submit" type="button" value="Enter"/>
+    <br>
+    <input id="login-submit" type="button" style ="background-color:orange;color:white;width:150px;height:40px;"value="Enter Game"/>
+    <br>
+    <br>
+    <p style="color:black">
+      <i>Welcome to Clueless. It's just like Clue, but less!<i>
+    </p>
+  </center>
     <!-- Choose your charactor:<br/>
     <select>
       <option value="colonelmustard">Colonel Mustard</option>
@@ -22,6 +54,17 @@
       <option value="mrswhite">Mrs White</option>
     </select> -->
 </body>
+<footer>
+    <style>
+      #footer{
+        position: absolute;
+        bottom: 0;
+      }
+    </style>
+    <div id="footer">
+    <img src= "logo.jpg" alt="ctrl alt defeat logo" width="300" height="90">
+  </div>
+</footer>
 <script>
     var username = {{username}};
     document.querySelector('#room-name-input').focus();
