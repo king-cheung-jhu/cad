@@ -1,0 +1,149 @@
+body {
+	/*background-color: #556B2F;*/
+  background-color: gainsboro;	
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto;
+  /* background-color: #2196F3; */
+  padding: 10px;
+}
+.grid-item {
+  background-color: rgba(125, 125, 125, 0.8); 
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.hallway-item {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  font-size: 10px;
+  text-align: center;
+  height: 20px;
+}
+
+.room-grid {
+  display: grid;
+  /* grid-template-columns: auto auto; */
+  grid-template-columns: auto minmax(350px, 350px);
+  /* background-color: #2196F3; */
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  padding: 0px;
+  background-color: olive;
+  margin: 20px 20px 20px 20px; 
+  
+}
+.character-grid-item {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  border-right: 2px solid peru;
+  border-top: 2px solid peru;
+  border-bottom: 2px solid peru;
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.grid-item-left {
+  border-left: 2px solid peru;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: auto auto;
+  background-color: peru;
+  padding: 5px;
+  padding-bottom: 15px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto;
+  padding: 20px;
+
+}
+
+.card-grid-item {
+  background-color: olive;
+  padding: 20px;
+  font-size: 20px;
+  text-align: center;
+  border-right: 2px solid peru;
+  border-top: 2px solid peru;
+  border-bottom: 2px solid peru;
+}
+
+.room {
+  background-color: honeydew;
+  height: 150px;
+
+}
+
+.hall {
+  background-color: cornsilk;
+}
+
+.hall-vertical{
+  padding-top: 70px;
+}
+
+.chat{
+  background-color: peru;
+}
+
+tr{
+  background-color: olive;
+}
+
+
+.game-card{
+  background-color: #CD853F;
+  width: 75%;
+  margin-left: 12.5%;
+}
+
+.submission{
+ background-color: olive;
+ margin: 0px 5px 0px 5px;
+}
+
+h1, h3{
+  text-align: center;
+}
+
+h1{
+  color: peru;
+}
+
+
+
+/*
+#studyR{
+	background-image: url("studyroom.png");
+	background-repeat: no-repeat;
+	height: 242px;
+	width: 242px;
+	padding:0px;
+}
+
+#hallR{
+	background-image: url("studyroom.png");	
+	background-repeat: no-repeat;
+	height: 242px;
+	width: 242px;
+	padding:0px;
+}
+
+#loungeR{
+	background-image: url("studyroom.png");
+	background-repeat: no-repeat;
+	height: 242px;
+	width: 242px;
+	padding:0px;
+}
+*/
