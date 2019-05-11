@@ -1,0 +1,42 @@
+<!-- chat/templates/chat/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Rooms</title>
+</head>
+<body>
+  <center>Clueless from Ctrl+Alt+Defeat</center>
+    Player Name:<br/>
+    <input id="player-name-input" type="text" size="100"/><br/>
+    What game would you like to enter?<br/>
+    <input id="room-name-input" type="text" size="100"/><br/>
+    <input id="login-submit" type="button" value="Enter"/>
+    <!-- Choose your charactor:<br/>
+    <select>
+      <option value="colonelmustard">Colonel Mustard</option>
+      <option value="professorpulm">Professor Pulm</option>
+      <option value="mrgreen">Mr Green</option>
+      <option value="mrspeacock">Mrs Peacock</option>
+      <option value="missscarlet">Miss Scarlet</option>
+      <option value="mrswhite">Mrs White</option>
+    </select> -->
+</body>
+<script>
+    var username = {{username}};
+    document.querySelector('#room-name-input').focus();
+    document.querySelector('#room-name-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#login-submit').click();
+        }
+    };
+
+    document.querySelector('#login-submit').onclick = function(e) {
+        var roomName = document.querySelector('#room-name-input').value;
+        var userName = document.querySelector('#player-name-input').value;
+        window.location.pathname = '/chat/' + roomName + '/' + userName + '/';
+    };
+
+    document.getElementById("myDropdown").classList.toggle("show");
+</script>
+</html>
