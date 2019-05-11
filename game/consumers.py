@@ -76,21 +76,35 @@ class GameConsumer(WebsocketConsumer):
 
         # var subjects = ['colonelmustard','professorpulm','mrgreen','mrspeacock','missscarlet','mrswhite'];
         # var weapons = ['candlestick','revolver','knife','leadpipe','rope','abc'];
+        
+    def update_turn(self,content):
+        
+        #get latest row data
+        turnnum = Game.objects.latest('id').getTurnNum()+1
+        turnuser = Game.objects.latest('id').getTurnUser()
+        playerlist = Game.objects.latest('id').getPlayerList()       
+        
+        #if last turn_user is the last in the array, wrap back around to first user
+        if playerlist.split(',').index(turnuser) >= len(playerlist.split(','))-1:
+            boardGame = Game(turn_num = turnnum, turn_user = playerlist.split(',')[0], player_list = playerlist)
+        else:
+            boardGame = Game(turn_num = turnnum, turn_user = playerlist.split(',')[playerlist.split(',').index(turnuser)+1],player_list = playerlist)       
+          
+        boardGame.save();
 
-    def player_starts_turn(self, data):
-
-        content = {
-            'command' : 'new_turn',
-            'turn_num': data['turnNum'],
-            'turn_user' : data['turnUser']
+        data = {
+            'command' : 'next_turn',
+            'turn_num': boardGame.getTurnNum(),
+            'turn_user' : boardGame.getTurnUser(),
+            'player_list' : boardGame.getPlayerList()           
         }
-        return self.advance_turn(content)
+        return self.advance_turn(data)
 
     def advance_turn(self, content):
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
             {
-                'type': 'next_turn',
+                'type': 'next_data',
                 'turn_data': content
             }
         )    
@@ -113,6 +127,68 @@ class GameConsumer(WebsocketConsumer):
             }
         )
 
+    def kill_player(self, content):
+        
+        #get latest row data
+        turnnum = Game.objects.latest('id').getTurnNum()+1
+        turnuser = Game.objects.latest('id').getTurnUser()
+        playerlist = Game.objects.latest('id').getPlayerList()
+        
+        #find next player turn
+        if playerlist.split(',').index(turnuser) >= len(playerlist.split(','))-1:
+            turnuser_new = playerlist.split(',')[0]
+        else:
+            turnuser_new = playerlist.split(',')[playerlist.split(',').index(turnuser)+1]
+              
+        #eliminate user from player_list
+        removed = playerlist.split(',')
+        removed.pop(1)
+        
+        #add new row for auto next turn
+        boardGame = Game(turn_num = turnnum, turn_user = turnuser_new, player_list = removed)
+        boardGame.save()
+           
+        data = {
+            'command' : 'wrong_acc',
+            'turn_num': boardGame.getTurnNum(),
+            'turn_user' : boardGame.getTurnUser(),
+            'player_list' : boardGame.getPlayerList()           
+        }
+        return self.killed_player(data)
+        
+    def killed_player(self,content):
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'kill',
+                'alive_list': content
+            }
+        )
+    
+    def init_game(self,content):
+
+        #players, location, timestamp of class not implemented yet
+        boardGame = Game(turn_num=1, turn_user=content['playerlist'].split(',')[0],
+                         player_list=content['playerlist'])
+        boardGame.save()
+
+        data = {
+            'command' : 'start_game',
+            'turn_num': boardGame.getTurnNum(),
+            'turn_user' : boardGame.getTurnUser(),
+            'player_list' : boardGame.getPlayerList()           
+        }
+        return self.start_game(data)
+        
+    def start_game(self,content):
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'start',
+                'start_data': content
+            }
+        )
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'game_%s' % self.room_name
@@ -168,9 +244,14 @@ class GameConsumer(WebsocketConsumer):
     def hands(self, content):
         return self.send(text_data=json.dumps(content['hands']))
 
-    def next_turn(self, content):
+    def next_data(self, content):
         return self.send(text_data=json.dumps(content['turn_data']))
 
+    def start(self, content):
+        return self.send(text_data=json.dumps(content['start_data']))  
+     
+    def kill(self, content):
+        return self.send(text_data=json.dumps(content['alive_list']))
 
     game_commands = {
         'fetch_messages' : fetch_messages,
@@ -179,5 +260,7 @@ class GameConsumer(WebsocketConsumer):
         'choose_character': assign_to_new_character,
         'secret': assign_secret,
         'hands': assign_hands,
-        'next_turn': advance_turn,
+        'next_turn': update_turn,
+        'start_game': init_game,
+        'wrong_accusation': kill_player,
     }

@@ -552,7 +552,6 @@
         this.turnNum = turnNum;
         this.turnUser = turnUser;
         this.moved = false; //has player moved this turn
-
     }
     
     //instantiate turn, probably unsafe
@@ -575,7 +574,13 @@
         assignHands(data['hands'][username]);
       }
       if (data['command']==='next_turn'){
-        shareTurn(data);
+        shareData(data);
+      }
+      if (data['command']==='start_game'){
+        initGameVal(data);
+      }   
+      if (data['command']==='wrong_acc'){
+        shareData(data);
       }
     }
     gameSocket.onopen = function(e) {
@@ -772,19 +777,27 @@
       }));     
     }
     
-    function sendTurnJson(){
+    function nextTurnJson(){
         return gameSocket.send(JSON.stringify({
-          'command': 'next_turn',
-          'turnUser': currentTurn.turnUser,
-          'turnNum': currentTurn.turnNum        
+          'command': 'next_turn'
       })); 
     }
     
-    function shareTurn(data){
+    function startGameJson(playerlist){
+        return gameSocket.send(JSON.stringify({
+          'command': 'start_game',
+          'playerlist': playerlist
+      })); 
+    }
+    
+    function shareData(data){
         //change local version
-        currentTurn.turnNum = data.turnNum;
-        currentTurn.turnUser = data.turnUser;
+        currentTurn.turnNum = data.turn_num;
+        currentTurn.turnUser = data.turn_user;
+        playerList = data.player_list; 
         
+        sendMessageFromSystem(playerList,'all');
+     
     }
 
     function getUserName(){
@@ -919,7 +932,17 @@
           alert('you win!');
         }else{
           alert('you lose');
+          eliminatePlayerJson();
+          sendMessageFromSystem(username + ' has been eliminated from the game!','all');
         }
+    }
+    
+    //eliminates current player after wrong accusation and increments turn
+    function eliminatePlayerJson(){
+        return gameSocket.send(JSON.stringify({
+          'command': 'wrong_accusation',
+          'eliminated': username
+      }));
     }
 
     function shuffle(array) {
@@ -974,25 +997,13 @@
         return currentTurn.turnUser === username;
     }
     
-    //increments turn class. Should be used after a move.
     function nextTurn(){
         
-        
-        playerList = getAllPlayers();      
-       
-        //change turn user   
-        if(playerList.indexOf(currentTurn.turnUser) + 1 === playerList.length){
-            currentTurn.turnUser = playerList[0]; //wrap around to beginning of array
-        }
-        else{                    
-            currentTurn.turnUser = playerList[playerList.indexOf(currentTurn.turnUser)+1];
-        }
-        
-        currentTurn.moved = false;
-        currentTurn.turnNum++;
-        sendMessageFromSystem('Turn: ' + currentTurn.turnNum,'all');
-        sendTurnJson();
-        sendMessageFromSystem(playerList,'all');
+        currentTurn.moved = false; 
+        nextTurnJson();       
+        setTimeout(function(){
+            sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
+        }, 250);
     }
     
     function endTurn(){
@@ -1014,6 +1025,17 @@
             }
         }
     }
+    
+    //used to pass arrays into JSON as 1 string, current format: delimited by comma
+    function arrayToString(array){
+        return array.join();
+    }
+    
+    function initGameVal(data){
+        currentTurn.turnNum = data.turn_num;
+        currentTurn.turnUser = data.turn_user;
+        //message in chat to indicate started game
+    }
 
     function startGame(){
         var num_of_players = checkNumOfPlayers();
@@ -1029,17 +1051,14 @@
             }
         sendSecretCardsJson(secretCards);
         sendHandsJson();
-        playerList = getAllPlayers();
-        gameStarted = true;
-      
-        //Begin Turn 1
-        currentTurn.turnNum++;
-        currentTurn.turnUser = playerList[0];
-      
-        //message in chat to indicate started game
-        sendMessageFromSystem('---------- Starting Game... ----------','all');
-        sendMessageFromSystem('Turn: ' + currentTurn.turnNum,'all');
-        sendMessageFromSystem(playerList,'all');
+        playerList = getAllPlayers(); //first assignment of playerList, players not removable or addable on frontend after
+        startGameJson(arrayToString(playerList)); //first turn assignments
+        gameStarted = true; //prevent multiple started games on same board      
+        setTimeout(function(){
+            sendMessageFromSystem('---------- Starting Game... ----------','all');
+            sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
+        }, 250);
+        
         }
         else if(gameStarted){
             alert('Game already started! Finish current game to start a new one');
