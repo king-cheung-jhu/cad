@@ -794,9 +794,7 @@
         //change local version
         currentTurn.turnNum = data.turn_num;
         currentTurn.turnUser = data.turn_user;
-        playerList = data.player_list; 
-        
-        sendMessageFromSystem(playerList,'all');
+        playerList = data.player_list.split(",");        
      
     }
 
@@ -930,10 +928,16 @@
       if (answer['character']===character &&answer['weapon']===weapon &&
         answer['room']===room){
           alert('you win!');
+          gameStarted = false;
         }else{
           alert('you lose');
           eliminatePlayerJson();
+          currentTurn.moved = false; 
           sendMessageFromSystem(username + ' has been eliminated from the game!','all');
+          setTimeout(function(){
+            sendMessageFromSystem('---------- Starting Game... ----------','all');
+            sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
+        }, 250); 
         }
     }
     
@@ -1000,7 +1004,8 @@
     function nextTurn(){
         
         currentTurn.moved = false; 
-        nextTurnJson();       
+        nextTurnJson();
+        sendMessageFromSystem(playerList,'all');
         setTimeout(function(){
             sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
         }, 250);

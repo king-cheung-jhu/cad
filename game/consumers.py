@@ -85,7 +85,7 @@ class GameConsumer(WebsocketConsumer):
         playerlist = Game.objects.latest('id').getPlayerList()       
         
         #if last turn_user is the last in the array, wrap back around to first user
-        if playerlist.split(',').index(turnuser) >= len(playerlist.split(','))-1:
+        if playerlist.split(',').index(turnuser) == len(playerlist.split(','))-1:
             boardGame = Game(turn_num = turnnum, turn_user = playerlist.split(',')[0], player_list = playerlist)
         else:
             boardGame = Game(turn_num = turnnum, turn_user = playerlist.split(',')[playerlist.split(',').index(turnuser)+1],player_list = playerlist)       
@@ -135,17 +135,18 @@ class GameConsumer(WebsocketConsumer):
         playerlist = Game.objects.latest('id').getPlayerList()
         
         #find next player turn
-        if playerlist.split(',').index(turnuser) >= len(playerlist.split(','))-1:
+        if playerlist.split(',').index(turnuser) == len(playerlist.split(','))-1:
             turnuser_new = playerlist.split(',')[0]
         else:
             turnuser_new = playerlist.split(',')[playerlist.split(',').index(turnuser)+1]
               
         #eliminate user from player_list
         removed = playerlist.split(',')
-        removed.pop(1)
+        removed.remove(content['eliminated'])
+        removedstring = ",".join(removed)
         
         #add new row for auto next turn
-        boardGame = Game(turn_num = turnnum, turn_user = turnuser_new, player_list = removed)
+        boardGame = Game(turn_num = turnnum, turn_user = turnuser_new, player_list = removedstring)
         boardGame.save()
            
         data = {
