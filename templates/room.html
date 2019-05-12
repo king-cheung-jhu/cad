@@ -313,12 +313,12 @@
           Suggestion<br/><br/>
           Choose the character:<br/>
           <select id='suggestion-character'>
-            <option value="colonelmustard">Colonel Mustard</option>
-            <option value="professorplum">Professor Plum</option>
-            <option value="mrgreen">Mr Green</option>
-            <option value="mrspeacock">Mrs Peacock</option>
-            <option value="missscarlet">Miss Scarlet</option>
-            <option value="mrswhite">Mrs White</option>
+            <option value="colonel-mustard">Colonel Mustard</option>
+            <option value="professor-plum">Professor Plum</option>
+            <option value="mr-green">Mr Green</option>
+            <option value="mrs-peacock">Mrs Peacock</option>
+            <option value="miss-scarlet">Miss Scarlet</option>
+            <option value="mrs-white">Mrs White</option>
           </select><br/>
           Choose the weapon:<br/>
           <select id='suggestion-weapon'>
@@ -335,10 +335,10 @@
             <option value="kitchen">Kitchen</option>
             <option value="ballroom">Ballroom</option>
             <option value="conservatory">Conservatory</option>
-            <option value="billiard">Billiard Room</option>
+            <option value="billiardroom">Billiard Room</option>
             <option value="library">Library</option>
             <option value="lounge">Lounge</option>
-            <option value="dining">Dining Room</option>
+            <option value="diningroom">Dining Room</option>
             <option value="hall">Hall</option>
           </select><br/>
           <input id="suggestion" type="button" value="Submit"
@@ -351,12 +351,12 @@
             Accusation<br/><br/>
             Choose the character:<br/>
             <select id='accusation-character'>
-              <option value="colonelmustard">Colonel Mustard</option>
-              <option value="professorplum">Professor Plum</option>
-              <option value="mrgreen">Mr Green</option>
-              <option value="mrspeacock">Mrs Peacock</option>
-              <option value="missscarlet">Miss Scarlet</option>
-              <option value="mrswhite">Mrs White</option>
+              <option value="colonel-mustard">Colonel Mustard</option>
+              <option value="professor-plum">Professor Plum</option>
+              <option value="mr-green">Mr Green</option>
+              <option value="mrs-peacock">Mrs Peacock</option>
+              <option value="miss-scarlet">Miss Scarlet</option>
+              <option value="mrs-white">Mrs White</option>
             </select><br/>
             Choose the weapon:<br/>
             <select id='accusation-weapon'>
@@ -376,7 +376,7 @@
               <option value="billiard">Billiard Room</option>
               <option value="library">Library</option>
               <option value="lounge">Lounge</option>
-              <option value="dining">Dining Room</option>
+              <option value="diningroom">Dining Room</option>
               <option value="hall">Hall</option>
             </select><br/>
             <input id="Accusation" type="button" value="Submit"
@@ -471,7 +471,7 @@
             <td><input id="chat-message-input" type="text" size="10"/><br/></td>
           </tr>
           <tr>
-            <td>Conserv atory</td>
+            <td>Conservatory</td>
             <td><input id="chat-message-input" type="text" size="10"/><br/></td>
           </tr>
           <tr>
@@ -536,6 +536,30 @@
       'ballroom': ['hallway11', 'hallway9', 'hallway12'],
       'hallway12': ['ballroom', 'kitchen'],
       'kitchen': ['hallway12', 'study', 'hallway10'],
+    };
+          
+    var formattedNomenLookup = {
+      'study': 'Study',
+      'hall': 'Hall',
+      'lounge': 'Lounge',
+      'library': 'Library',
+      'billiardroom': 'Billiard Room',
+      'diningroom': 'Dining Room',
+      'conservatory': 'Conservatory',
+      'ballroom': 'Ball Room',
+      'kitchen': 'Kitchen',
+      'colonel-mustard': 'Colonel Mustard',
+      'miss-scarlet':'Miss Scarlet',
+      'professor-plum':'Professor Plum',
+      'mrs-peacock':'Mrs. Peacock',
+      'mr-green':'Mr. Green',
+      'mrs-white':'Mrs. White',
+      'candlestick':'Candlestick',
+      'revolver':'Revolver',
+      'knife':'Knife',
+      'leadpipe':'Leadpipe',
+      'rope':'Rope',
+      'wrench':'Wrench',
     };
 
     var startingPoint = {
@@ -684,8 +708,24 @@
       // } else{
       //   var character = document.getElementById(character).value;
       // }
-      chooseLocation(room, true, character);
-      sendMessage('suggestion - room: ' + room + ' weapon: '+weapon + ' character: ' + character, 'all');
+      
+      if(room === currentLocation(username) && !isHallway(currentLocation(username)))
+      {
+        suggestionUser = document.querySelector('#' + character + '-who').innerHTML;
+        
+        if(suggestionUser !== ''){
+            chooseLocation(room, true, suggestionUser);
+        }
+        sendMessage('Suggestion - ROOM: ' + formattedNomenLookup[room] + ' |' + ' WEAPON: '+formattedNomenLookup[weapon]+ ' |' + ' CHARACTER: ' + formattedNomenLookup[character], 'all');
+      }
+      else if(isHallway(currentLocation(username)))
+      {
+        alert(username + ': Can\'t make suggestion because you are in a hallway', 'all');
+      }
+      else
+      {
+        alert(username + ': Can\'t make suggestion in ' + formattedNomenLookup[room] + ' because you are not in that room!', 'all');
+      }
     }
 
     function fetchMessages(){
@@ -767,8 +807,17 @@
         alert('played by someone already!');
       }
     }
-	
-	
+    
+    function isHallway(location){
+        if(location.includes("hallway")){
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+		
     function sendLocationJson(username, location){
       return gameSocket.send(JSON.stringify({
           'command': 'move',
@@ -805,11 +854,20 @@
     function checkIfPlayerCanGotoThatRoom(old_location, new_location){
       return paths[old_location].includes(new_location);
     }
-
-    function currentLocation(){
+    
+    function locationOtherUser(user){
+        var grid_detail = document.getElementsByClassName('room');
+      for (var i=0; i<grid_detail.length; i++){
+        if (grid_detail[i].innerHTML.includes(user)) {
+          return grid_detail[i].id.replace('-who', '');
+        }
+      }
+    }
+    
+    function currentLocation(user){
       var grid_detail = document.getElementsByClassName('room');
       for (var i=0; i<grid_detail.length; i++){
-        if (grid_detail[i].innerHTML.includes(username)) {
+        if (grid_detail[i].innerHTML.includes(user)) {
           return grid_detail[i].id.replace('-who', '');
         }
       }
@@ -827,8 +885,8 @@
     function chooseLocation(location, teleport=false, user=getUserName(), suggestion=''){
       if(teleport || (isMyTurn() && !currentTurn.moved)){
               
-      if (teleport){
-        if (location.substring(0,7)==='hallway'){
+      if (teleport){ //movement from a suggestion
+        if (location.substring(0,7)==='hallway'){ //not really needed because teleport will theoretically never be into a hallway
           if (document.querySelector('#'+location+'-who').innerHTML===''){
             sendLocationJson(user, location);		
           } else {
@@ -836,62 +894,62 @@
           }
         } else{
           if (document.querySelector('#'+location+'-who').innerHTML===''){
-            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
-              sendLocationJson('', currentLocation());
+            if (document.querySelector('#'+currentLocation(user)+'-who').innerHTML===''){
+              sendLocationJson('', currentLocation(user));
               sendLocationJson(user, location);
             } else {
-              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string = document.querySelector('#'+currentLocation(user)+'-who').innerHTML.replace(',','');
               character_string=character_string.replace(user, '');
-              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(character_string, currentLocation(user));
               sendLocationJson(user, location);
             }
           } else{
-            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
+            if (document.querySelector('#'+currentLocation(user)+'-who').innerHTML===''){
               character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
-              sendLocationJson('', currentLocation());
+              sendLocationJson('', currentLocation(user));
               sendLocationJson(character_string, location);
             } else {
-              console.log('this scenario');
-              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              //console.log('this scenario');
+              character_string = document.querySelector('#'+currentLocation(user)+'-who').innerHTML.replace(',','');
               character_string=character_string.replace(user, '');
               new_character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
-              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(character_string, currentLocation(user));
               sendLocationJson(new_character_string, location);
             }
           }         
         }
-      } else if (checkIfPlayerCanGotoThatRoom(currentLocation(), location) && !teleport){
+      } else if (checkIfPlayerCanGotoThatRoom(currentLocation(username), location) && !teleport){
         if (location.substring(0,7)==='hallway'){
           if (document.querySelector('#'+location+'-who').innerHTML===''){
-            character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+            character_string = document.querySelector('#'+currentLocation(username)+'-who').innerHTML.replace(',','');
             character_string=character_string.replace(user, '');
             sendLocationJson(user, location);
-            sendLocationJson(character_string, currentLocation());
+            sendLocationJson(character_string, currentLocation(username));
             currentTurn.moved = true;
           } else {
             alert('Someone is in the hallway already');
           }
         } else{
           if (document.querySelector('#'+location+'-who').innerHTML===''){
-            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
-              sendLocationJson('', currentLocation());
+            if (document.querySelector('#'+currentLocation(username)+'-who').innerHTML===''){
+              sendLocationJson('', currentLocation(username));
               sendLocationJson(user, location);
             } else {
-              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string = document.querySelector('#'+currentLocation(username)+'-who').innerHTML.replace(',','');
               character_string=character_string.replace(user, '');
-              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(character_string, currentLocation(username));
               sendLocationJson(user, location);
             }
           } else{
-            if (document.querySelector('#'+currentLocation()+'-who').innerHTML===''){
+            if (document.querySelector('#'+currentLocation(username)+'-who').innerHTML===''){
               character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
-              sendLocationJson('', currentLocation());
+              sendLocationJson('', currentLocation(username));
               sendLocationJson(character_string, location);
             } else {
-              character_string = document.querySelector('#'+currentLocation()+'-who').innerHTML.replace(',','');
+              character_string = document.querySelector('#'+currentLocation(username)+'-who').innerHTML.replace(',','');
               character_string=character_string.replace(user, '');
               new_character_string = document.querySelector('#'+location+'-who').innerHTML + ',' + user;
-              sendLocationJson(character_string, currentLocation());
+              sendLocationJson(character_string, currentLocation(username));
               sendLocationJson(new_character_string, location);
             }
           }         
@@ -927,10 +985,10 @@
       var answer = JSON.parse(document.querySelector('#secret-card-item').innerHTML);
       if (answer['character']===character &&answer['weapon']===weapon &&
         answer['room']===room){
-          alert('you win!');
+          alert('You have won the game');
           gameStarted = false;
         }else{
-          alert('you lose');
+          alert('You lose and are eliminated. You can still watch the game!');
           eliminatePlayerJson();
           currentTurn.moved = false; 
           sendMessageFromSystem(username + ' has been eliminated from the game!','all');
@@ -994,8 +1052,7 @@
       orderList.splice(orderList.indexOf(target),1);
       return orderList;
     }
-    
-    
+     
     //returns boolean that tells you if it's your turn or not.
     function isMyTurn(){
         return currentTurn.turnUser === username;
@@ -1005,7 +1062,6 @@
         
         currentTurn.moved = false; 
         nextTurnJson();
-        sendMessageFromSystem(playerList,'all');
         setTimeout(function(){
             sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
         }, 250);
@@ -1013,7 +1069,8 @@
     
     function endTurn(){
         if(currentTurn.turnUser === username){
-            nextTurn();  
+            nextTurn();
+            alert('You have ended your turn!');
         }
         else{
             alert('It is not your turn!');
