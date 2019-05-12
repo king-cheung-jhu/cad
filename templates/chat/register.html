@@ -1,7 +1,9 @@
 <!-- chat/templates/chat/register.html -->
 <style>
   body {
-    color: white;
+  <!--margin: 2em auto;-->
+  max-width: 600px;
+  color: white;
     font-family: verdana;
     background-color:#E8E8E8;
     <!--background-image:url("question.jpg"); -->
@@ -10,24 +12,67 @@
     background-size: 150px 150px;
     background-repeat: no-repeat;
 
+}
 
-
-
-  }
+form div {
+    margin-bottom: 0.5em;
+}
+form div label, form div input {
+    display: block;
+    margin-bottom: 0.3em;
+}
 </style>
+<center>
 
-<body>
-<form action="action_page.php">
-    <div class="container">
-        <h1 style= "color:orange;">Register</h1>
-        <p style="color:orange;">Please fill in this form to create an account</p>
-        <hr>
-        <label for "name" style="color:orange;"><b>Name</b></label>
-        <input type="text" placeholder="Enter Name" name="name" required>
-        <button type= "submit" class="registerbtn">Register</button>
-        <br>
-        <br>
-        <center><button style="background-color: orange;color:white;font-size:20px;width:300px;height:50px;" onclick="window.location.href='index.html'";"> Enter a Game</button></center>
+    Registration
+    <hr>
+
+</center>
+<form id="test" action="#" method="post">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input class="form-control" type="text" name="name" id="name" />
     </div>
+
+    <p>
+        <input type="submit" value="Submit" class="btn btn-primary btn-block" />
+    </p>
 </form>
-</body>
+<pre id="output"></pre>
+
+
+<script>
+    /*
+    (function() {
+    function toJSONString( form ) {
+        var obj = {};
+        var elements = form.querySelectorAll( "input" );
+        var name = elements.name;
+        /*for( var i = 0; i < elements.length; ++i ) {
+            var element = elements[i];
+            var name = element.name;
+            var value = element.value;*/
+
+          /*  if( name ) {
+                obj[ name ] = value;
+            }
+        }
+
+        return JSON.stringify( obj );
+    }
+
+    document.addEventListener( "DOMContentLoaded", function() {
+        var form = document.getElementById( "test" );
+        var output = document.getElementById( "output" );
+        form.addEventListener( "submit", function( e ) {
+            e.preventDefault();
+            var json = toJSONString( this );
+            output.innerHTML = json;
+
+        }, false);
+
+    });
+
+})();
+*/
+</script>
