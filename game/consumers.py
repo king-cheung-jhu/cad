@@ -144,7 +144,10 @@ class GameConsumer(WebsocketConsumer):
         removed = playerlist.split(',')
         removed.remove(content['eliminated'])
         removedstring = ",".join(removed)
-        
+
+        if not removed:
+            removedstring = ""
+            turnuser_new = "none"
         #add new row for auto next turn
         boardGame = Game(turn_num = turnnum, turn_user = turnuser_new, player_list = removedstring)
         boardGame.save()
@@ -190,6 +193,22 @@ class GameConsumer(WebsocketConsumer):
                 'start_data': content
             }
         )
+
+    def notify_win(self,content):
+
+        data = {
+            'command' : 'end_game',
+            'winner' : content['user']
+        }
+
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name,
+            {
+                'type': 'win',
+                'win_notif': data
+            }
+        )
+
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'game_%s' % self.room_name
@@ -254,6 +273,9 @@ class GameConsumer(WebsocketConsumer):
     def kill(self, content):
         return self.send(text_data=json.dumps(content['alive_list']))
 
+    def win(self,content):
+        return self.send(text_data=json.dumps(content['win_notif']))
+
     game_commands = {
         'fetch_messages' : fetch_messages,
         'new_messages' : new_message,
@@ -264,4 +286,5 @@ class GameConsumer(WebsocketConsumer):
         'next_turn': update_turn,
         'start_game': init_game,
         'wrong_accusation': kill_player,
+        'win': notify_win,
     }

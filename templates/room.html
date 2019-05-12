@@ -351,12 +351,12 @@
             Accusation<br/><br/>
             Choose the character:<br/>
             <select id='accusation-character'>
-              <option value="colonel-mustard">Colonel Mustard</option>
-              <option value="professor-plum">Professor Plum</option>
-              <option value="mr-green">Mr Green</option>
-              <option value="mrs-peacock">Mrs Peacock</option>
-              <option value="miss-scarlet">Miss Scarlet</option>
-              <option value="mrs-white">Mrs White</option>
+              <option value="colonelmustard">Colonel Mustard</option>
+              <option value="professorplum">Professor Plum</option>
+              <option value="mrgreen">Mr Green</option>
+              <option value="mrspeacock">Mrs Peacock</option>
+              <option value="missscarlet">Miss Scarlet</option>
+              <option value="mrswhite">Mrs White</option>
             </select><br/>
             Choose the weapon:<br/>
             <select id='accusation-weapon'>
@@ -373,7 +373,7 @@
               <option value="kitchen">Kitchen</option>
               <option value="ballroom">Ballroom</option>
               <option value="conservatory">Conservatory</option>
-              <option value="billiard">Billiard Room</option>
+              <option value="billiardroom">Billiard Room</option>
               <option value="library">Library</option>
               <option value="lounge">Lounge</option>
               <option value="diningroom">Dining Room</option>
@@ -576,6 +576,7 @@
         this.turnNum = turnNum;
         this.turnUser = turnUser;
         this.moved = false; //has player moved this turn
+        this.suggested = false;
     }
     
     //instantiate turn, probably unsafe
@@ -605,6 +606,9 @@
       }   
       if (data['command']==='wrong_acc'){
         shareData(data);
+      }
+      if (data['command']==='end_game'){
+        endGame(data);
       }
     }
     gameSocket.onopen = function(e) {
@@ -717,6 +721,7 @@
             chooseLocation(room, true, suggestionUser);
         }
         sendMessage('Suggestion - ROOM: ' + formattedNomenLookup[room] + ' |' + ' WEAPON: '+formattedNomenLookup[weapon]+ ' |' + ' CHARACTER: ' + formattedNomenLookup[character], 'all');
+        currentTurn.suggested = true;
       }
       else if(isHallway(currentLocation(username)))
       {
@@ -848,6 +853,7 @@
         if(currentTurn.turnUser === username){
             alert('It is now your turn, ' + username);
         }
+        everyoneLostCheck();
     }
 
     function getUserName(){
@@ -888,13 +894,13 @@
     function chooseLocation(location, teleport=false, user=getUserName(), suggestion=''){
       if(teleport || (isMyTurn() && !currentTurn.moved)){
               
-      if (teleport){ //movement from a suggestion
-        if (location.substring(0,7)==='hallway'){ //not really needed because teleport will theoretically never be into a hallway
+      if (teleport){ //movement from a suggestion or wrong accusation
+        if (location.substring(0,7)==='hallway'){ //never really used, can't teleport to hallway
           if (document.querySelector('#'+location+'-who').innerHTML===''){
             sendLocationJson(user, location);		
           } else {
             alert('Someone is in the hallway already');
-          }
+          }                  
         } else{
           if (document.querySelector('#'+location+'-who').innerHTML===''){
             if (document.querySelector('#'+currentLocation(user)+'-who').innerHTML===''){
@@ -956,10 +962,7 @@
               sendLocationJson(new_character_string, location);
             }
           }         
-          currentTurn.moved = true; //player has made move, can no longer move
-          
-          
-          
+          currentTurn.moved = true; //player has made move, can no longer move                
         }
       }
       
@@ -986,13 +989,16 @@
       var weapon = document.getElementById(weap).value;
       var room = document.getElementById(loc).value;
       var answer = JSON.parse(document.querySelector('#secret-card-item').innerHTML);
+      sendMessageFromSystem('testonly: ' + answer.character + answer.room + answer.weapon,'all');
       if (answer['character']===character &&answer['weapon']===weapon &&
         answer['room']===room){
           alert('You have won the game');
+          winnerJson();
           gameStarted = false;
         }else{
           alert('You lose and are eliminated. You can still watch the game!');
           eliminatePlayerJson();
+          //cleanUpPlayer();
           currentTurn.moved = false; 
           sendMessageFromSystem(username + ' has been eliminated from the game!','all');
           setTimeout(function(){
@@ -1000,6 +1006,11 @@
             sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
         }, 250); 
         }
+    }
+    
+    //removes current player off of the board, doesn't work currently
+    function cleanUpPlayer(){
+        chooseLocation('',true,username);
     }
     
     //eliminates current player after wrong accusation and increments turn
@@ -1050,6 +1061,13 @@
           'hands': shuffleCardsForHands()
       }));
     }
+    
+    function winnerJson(){
+      return gameSocket.send(JSON.stringify({
+          'command': 'win',
+          'user': username
+      }));
+    }
 
     function removeCharacterInOrderList(target){
       orderList.splice(orderList.indexOf(target),1);
@@ -1063,7 +1081,8 @@
     
     function nextTurn(){
         
-        currentTurn.moved = false; 
+        currentTurn.moved = false;
+        currentTurn.suggested = false;
         nextTurnJson();
         setTimeout(function(){
             sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');    
@@ -1081,7 +1100,7 @@
         //insert additional processing at end of turn, if needed
     }
     
-    //removes current user(player) after wrong accusation. Can only be called by the relevant user on their turn
+    //OBSOLETE: removes current user(player) after wrong accusation. Can only be called by the relevant user on their turn
     function removeUserFromPlayerList(){
         for(var i=0; i < playerList.length; i++){
             if(playerList[i] === username){
@@ -1100,6 +1119,15 @@
         currentTurn.turnNum = data.turn_num;
         currentTurn.turnUser = data.turn_user;
         //message in chat to indicate started game
+    }
+    
+    function endGame(data){
+        alert(data.winner + ' is the winner! Please refresh to play another game');
+    }
+    
+    function everyoneLostCheck(){
+        if(currentTurn.turnUser == 'none')
+            alert('Everyone has lost! Refresh the page to play another game!');
     }
 
     function startGame(){
