@@ -843,8 +843,11 @@
         //change local version
         currentTurn.turnNum = data.turn_num;
         currentTurn.turnUser = data.turn_user;
-        playerList = data.player_list.split(",");        
-     
+        playerList = data.player_list.split(",");
+        
+        if(currentTurn.turnUser === username){
+            alert('It is now your turn, ' + username);
+        }
     }
 
     function getUserName(){
