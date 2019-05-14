@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^chat/', include('chat.urls')),
     url(r'^game/', include('game.urls')),
     # url(r'^admin/', admin.site.urls),
+    url(r'', include('chat.urls')),
     url(r'^chat/(?P<room_name>[^/]+)/(?P<user_name>[^/]+)/$', RoomView.as_view()),
     url(r'^game/(?P<room_name>[^/]+)/(?P<user_name>[^/]+)/$', GameView.as_view()),
 ]

@@ -17,7 +17,7 @@ class RoomView(TemplateView):
         return context
 
 def index(request):
-    return render(request, 'chat/index.html', {'username': mark_safe(json.dumps(request.user.username))})
+    return render(request, 'index.html', {'username': mark_safe(json.dumps(request.user.username))})
 
 @login_required
 def room(request, room_name):
