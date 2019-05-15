@@ -329,10 +329,10 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
             <br/>
             <select id="chat-to">
               <option value="all">all</option>
-              <!-- <option value="king">king</option>
-              <option value="justin">justin</option>
-              <option value="bryan">bryan</option>
-              <option value="taylor">taylor</option> -->
+              <option value="Bryan">Bryan</option>
+              <option value="King">King</option>
+              <option value="Justin">Justin</option>
+              <option value="Taylor">Taylor</option>
             </select>
             <!-- <input id="chat-to" type="text" size="5"> -->
             <input id="chat-message-input" type="text" size="20">
@@ -349,7 +349,7 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
               <option value="colonel-mustard">Colonel Mustard</option>
               <option value="professor-plum">Professor Plum</option>
               <option value="mr-green">Mr Green</option>
-              <option value="mr-speacock">Mrs Peacock</option>
+              <option value="mrs-peacock">Mrs Peacock</option>
               <option value="miss-scarlet">Miss Scarlet</option>
               <option value="mrs-white">Mrs White</option>
             </select><br/>
@@ -362,18 +362,6 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
               <option value="rope">Rope</option>
               <option value="wrench">Wrench</option>
             </select><br/>
-            Choose the room:
-            <select id='suggestion-room'>
-              <option value="study">Study</option>
-              <option value="kitchen">Kitchen</option>
-              <option value="ballroom">Ballroom</option>
-              <option value="conservatory">Conservatory</option>
-              <option value="billiard">Billiard Room</option>
-              <option value="library">Library</option>
-              <option value="lounge">Lounge</option>
-              <option value="dining">Dining Room</option>
-              <option value="hall">Hall</option>
-            </select><br/><br/>
             <button class="btn btn-primary btn-sm" id="suggestion" type="button" value="Submit"
             onclick="sendSuggestion('suggestion-room',
               'suggestion-weapon', 'suggestion-character')">Suggest</button>
@@ -490,6 +478,12 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
       'mrs-peacock':'Mrs. Peacock',
       'mr-green':'Mr. Green',
       'mrs-white':'Mrs. White',
+      'colonelmustard': 'Colonel Mustard',
+      'missscarlet':'Miss Scarlet',
+      'professorplum':'Professor Plum',
+      'mrspeacock':'Mrs. Peacock',
+      'mrgreen':'Mr. Green',
+      'mrswhite':'Mrs. White',
       'candlestick':'Candlestick',
       'revolver':'Revolver',
       'knife':'Knife',
@@ -541,7 +535,7 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
         initGameVal(data);
       }
       if (data['command']==='wrong_acc'){
-        cleanUpPlayer(currentTurn.turnUser);
+        //cleanUpPlayer(currentTurn.turnUser);
         shareData(data);
       }
       if (data['command']==='end_game'){
@@ -570,10 +564,12 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
             }
           }
         } else if (data['command']==='new_message'){
+            
             if (data['message']['author']==username ||
                 data['message']['to']==username ||
                 data['message']['to']=='' ||
                 data['message']['to']=='all'){
+            console.log(data);
               createMessage(data['message']);
             }
         }
@@ -658,24 +654,38 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
       // } else{
       //   var character = document.getElementById(character).value;
       // }
-
-      if(room === currentLocation(username) && !isHallway(currentLocation(username)))
+      
+      /*var character_list = document.getElementsByClassName('character');
+            for (var i=0; i<character_list.length; i++){
+                if (character_list[i].innerHTML !==''){*/
+      
+      if(room === currentLocation(username) && !isHallway(currentLocation(username)) && !currentTurn.suggested && currentTurn.turnUser === username)
       {
-        suggestionUser = document.querySelector('#' + character + '-who').innerHTML;
-
-        if(suggestionUser !== '' && suggestionUser !== username && isAlive(suggestionUser)){
+        if (document.querySelector('#' + character + '-who').innerHTML ==''){
+            suggestionUser = formattedNomenLookup[character];
+        }
+        else{
+            suggestionUser = document.querySelector('#' + character + '-who').innerHTML;
+        }
+           
+        //if(suggestionUser !== '' && suggestionUser !== username){
+        if(suggestionUser !== username){
             chooseLocation(room, true, suggestionUser);
         }
         sendMessage('Suggestion - ROOM: ' + formattedNomenLookup[room] + ' |' + ' WEAPON: '+formattedNomenLookup[weapon]+ ' |' + ' CHARACTER: ' + formattedNomenLookup[character], 'all');
+        sendMessageFromSystem(formattedNomenLookup[character] + ' has been moved to ' + formattedNomenLookup[room] + '!','all');
         currentTurn.suggested = true;
+      }
+      else if(currentTurn.turnUser !== username){
+          alert('It is not your turn yet!');
       }
       else if(isHallway(currentLocation(username)))
       {
-        alert(username + ': Can\'t make suggestion because you are in a hallway', 'all');
+        alert(username + ': Can\'t make suggestion because you are in a hallway');
       }
       else
       {
-        alert(username + ': Can\'t make suggestion in ' + formattedNomenLookup[room] + ' because you are not in that room!', 'all');
+        alert(username + ': You\'ve already made a suggestion this turn!');
       }
     }
 
@@ -699,6 +709,7 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
     function assignCharacter(data){
       document.querySelector('#' + data.character + '-who').innerHTML = data.from;
     }
+    
 
     function assignSecret(data){
       console.log(JSON.stringify(data));
@@ -927,7 +938,7 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
           'character': cards.character,
           'room':cards.room,
           'weapon':cards.weapon
-      }));
+      }));   
     }
 
     function checkAccusation(char,weap,loc) {
@@ -935,22 +946,30 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
       var weapon = document.getElementById(weap).value;
       var room = document.getElementById(loc).value;
       var answer = JSON.parse(document.querySelector('#secret-card-item').innerHTML);
+      if(currentTurn.turnUser === username){
       sendMessageFromSystem('testonly: ' + answer.character + answer.room + answer.weapon,'all');
+      sendMessage('Accusation - ROOM: ' + formattedNomenLookup[room] + ' |' + ' WEAPON: '+formattedNomenLookup[weapon]+ ' |' + ' CHARACTER: ' + formattedNomenLookup[character], 'all');
       if (answer['character']===character &&answer['weapon']===weapon &&
         answer['room']===room){
           alert('You have won the game');
+          sendMessageFromSystem(username + 'has won the game!','all');
           winnerJson();
           gameStarted = false;
         }else{
           alert('You lose and are eliminated. You can still watch the game!');
+          sendMessageFromSystem(username + ' has been eliminated! He/she must still participate in suggestions.','all');
           eliminatePlayerJson();
           currentTurn.moved = false;
           sendMessageFromSystem(username + ' has been eliminated from the game!','all');
           setTimeout(function(){
-            sendMessageFromSystem('---------- Starting Game... ----------','all');
             sendMessageFromSystem('Turn: ' + currentTurn.turnNum + ' -- ' + currentTurn.turnUser,'all');
         }, 250);
         }
+    }
+    else
+    {
+        alert('It is not your turn!');
+    }
     }
 
     //removes current player off of the board, doesn't work currently
@@ -1088,6 +1107,11 @@ integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07j
                 if (character_list[i].innerHTML !==''){
                     var location = startingPoint[character_list[i].id.replace('-', '').replace('-who', '')];
                     chooseLocation(location, true, character_list[i].innerHTML);
+                }
+                else
+                {
+                    var location = startingPoint[character_list[i].id.replace('-', '').replace('-who', '')];
+                    chooseLocation(location, true, formattedNomenLookup[character_list[i].id.replace('-who', '')]);
                 }
             }
         sendSecretCardsJson(secretCards);
